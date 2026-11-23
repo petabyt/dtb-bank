@@ -1,0 +1,19 @@
+kernels:
+  - name: mainline
+    repository: https://github.com/gregkh/linux.git
+    versions:
+      - v6.12.119
+      - v6.18.65
+      - v7.3.6
+      - v7.4-rc4
+    selection: all
+
+  # Enable this entry after choosing the vendor DTBs to build.
+  - name: armbian-rockchip
+    enabled: false
+    repository: https://github.com/armbian/linux-rockchip.git
+    versions:
+      - linux-6.1-stan-rkr7.2
+      - linux-6.12-stan-rkr1.1
+    selection: listed
+    targets: []

@@ -1,0 +1,2 @@
+vendor kernels:
+- https://github.com/coolpi-george/coolpi-kernel
