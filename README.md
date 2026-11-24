@@ -20,11 +20,14 @@ Checksums cover the DTB assets; MD5 is provided for compatibility, not security.
 Mainline builds do not include Armbian patches. Vendor builds use the configured
 repository without additional patches.
 
-Existing published releases are skipped. Uploads begin as drafts, and a tag
-with a draft or missing release is treated as an error rather than silently
-replaced. Inspect and remove the incomplete release and tag manually before
-retrying. Changing a published configuration entry does not rebuild it; use a
-new release tag for a revised build.
+Existing published releases are skipped. Uploads begin as drafts. On retry, the
+script rebuilds the DTBs and resumes a matching draft, checking the SHA-256
+digest of every existing asset before skipping it. A mismatch, unexpected
+asset, or tag without a release requires manual inspection. Changing a
+published configuration entry does not rebuild it; use a new release tag for
+a revised build. GitHub limits releases to 1,000 assets and may rate-limit
+individual uploads; the script waits and retries when rate-limited, so large
+releases can take hours and may need another workflow run to finish.
 
 To run locally, install the dependencies in `requirements.txt`, the ARM and
 ARM64 cross-compilers and kernel build dependencies, and authenticate the GitHub
