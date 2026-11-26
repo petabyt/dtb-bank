@@ -44,6 +44,39 @@ class ConfigurationTests(unittest.TestCase):
         run.return_value = "taghash\trefs/tags/v1\ncommithash\trefs/tags/v1^{}\n"
         self.assertEqual(module.resolve_commit("https://github.com/a/b.git", "v1"), "commithash")
 
+    def test_pinned_commit_validation(self):
+        kernel = self.kernel() | {"commit": "a" * 40}
+        module.validate({"kernels": [kernel]})
+        for invalid in ("abc", "A" * 40, 123):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                module.validate({"kernels": [kernel | {"commit": invalid}]})
+        with self.assertRaises(ValueError):
+            module.validate({"kernels": [kernel | {"versions": ["v1", "v2"]}]})
+
+    @patch.object(module, "resolve_commit")
+    @patch.dict(module.os.environ, {"GH_REPO": "owner/repo"})
+    @patch.object(module, "download_source", side_effect=RuntimeError("stop after resolution"))
+    @patch.object(module, "github_request", return_value=None)
+    @patch.object(module, "find_release", return_value=None)
+    def test_publish_uses_pinned_commit(self, find_release, request, download, resolve):
+        kernel = self.kernel() | {"commit": "a" * 40}
+        with self.assertRaisesRegex(RuntimeError, "stop after resolution"):
+            module.publish(kernel, "snapshot")
+        resolve.assert_not_called()
+        self.assertEqual(download.call_args.args[1], "a" * 40)
+
+    @patch.object(module, "resolve_commit", return_value="b" * 40)
+    @patch.dict(module.os.environ, {"GH_REPO": "owner/repo"})
+    @patch.object(module, "download_source", side_effect=RuntimeError("stop after resolution"))
+    @patch.object(module, "github_request", return_value=None)
+    @patch.object(module, "find_release", return_value=None)
+    def test_publish_still_resolves_tags(self, find_release, request, download, resolve):
+        kernel = self.kernel()
+        with self.assertRaisesRegex(RuntimeError, "stop after resolution"):
+            module.publish(kernel, "v1")
+        resolve.assert_called_once_with(kernel["repository"], "v1")
+        self.assertEqual(download.call_args.args[1], "b" * 40)
+
 
 class ReleaseTests(unittest.TestCase):
     @patch.dict(module.os.environ, {"GH_TOKEN": "token"})

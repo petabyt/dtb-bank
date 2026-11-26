@@ -47,6 +47,9 @@ def validate(config):
         versions = kernel.get("versions")
         if not isinstance(versions, list) or not versions:
             raise ValueError(f"{name}: versions must be a nonempty list")
+        commit = kernel.get("commit")
+        if commit is not None and (not isinstance(commit, str) or not re.fullmatch(r"[0-9a-f]{40}", commit) or len(versions) != 1):
+            raise ValueError(f"{name}: commit must be a full lowercase SHA-1 and requires exactly one version")
         targets = kernel.get("targets", [])
         if not isinstance(targets, list) or (kernel.get("enabled", True) and kernel["selection"] == "listed" and not targets):
             raise ValueError(f"{name}: listed selection requires targets")
@@ -78,7 +81,7 @@ def download_source(repository, commit, destination):
     url = f"https://github.com/{owner}/{repo}/archive/{commit}.tar.gz"
     archive = destination / "source.tar.gz"
     print(f"Downloading {url}", flush=True)
-    with urllib.request.urlopen(url, timeout=120) as response, archive.open("wb") as output:
+    with urllib.request.urlopen(url, timeout=600) as response, archive.open("wb") as output:
         shutil.copyfileobj(response, output)
     with tarfile.open(archive, "r:gz") as tar:
         roots = {Path(member.name).parts[0] for member in tar.getmembers() if member.name}
@@ -216,7 +219,7 @@ def publish(kernel, version):
         return
     if release is None and github_request("GET", api_url(f"git/ref/tags/{tag}"), allow_not_found=True):
         raise RuntimeError(f"tag {tag} exists without a release; inspect it before retrying")
-    commit = resolve_commit(kernel["repository"], version)
+    commit = kernel.get("commit") or resolve_commit(kernel["repository"], version)
     with tempfile.TemporaryDirectory(prefix="dtb-bank-") as tmp:
         work = Path(tmp)
         source = download_source(kernel["repository"], commit, work)

@@ -17,3 +17,32 @@ kernels:
       - linux-6.12-stan-rkr1.1
     selection: listed
     targets: []
+
+  # Snapshot of linux-6.1-stan-rkr3.1; use a new version when updating it.
+  - name: coolpi
+    repository: https://github.com/coolpi-george/coolpi-kernel.git
+    versions:
+      - linux-6.1-stan-rkr3.1-7a12feb8
+    commit: 7a12feb8dddeb7fb2c5c0b3df67a861bc666d4cd
+    selection: listed
+    targets:
+      - rockchip/rk3588-cpcm5-aibox-uboot.dtb
+      - rockchip/rk3588-cpcm5-aibox.dtb
+      - rockchip/rk3588-cpcm5-chn60-58-uboot.dtb
+      - rockchip/rk3588-cpcm5-chn60-58.dtb
+      - rockchip/rk3588-cpcm5-evb-v11.dtb
+      - rockchip/rk3588-cpcm5-evb.dtb
+      - rockchip/rk3588-cpcm5-genbook-uboot.dtb
+      - rockchip/rk3588-cpcm5-genbook.dtb
+      - rockchip/rk3588-cpcm5-hmi11-uboot.dtb
+      - rockchip/rk3588-cpcm5-hmi11.dtb
+      - rockchip/rk3588-cpcm5-lz.dtb
+      - rockchip/rk3588-cpcm5-minipc.dtb
+      - rockchip/rk3588-cpcm5-notebook-v20.dtb
+      - rockchip/rk3588-cpcm5-v86v1.dtb
+      - rockchip/rk3588-cpcm5-vmsv1-uboot.dtb
+      - rockchip/rk3588-cpcm5-vmsv1.dtb
+      - rockchip/rk3588-cpcm5-vmsv2.dtb
+      - rockchip/rk3588-cpcm5-vmsv3.dtb
+      - rockchip/rk3588-cpcm5-vmsv4.dtb
+      - rockchip/rk3588-cpcm5-vmsv5.dtb
